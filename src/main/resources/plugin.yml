@@ -1,0 +1,13 @@
+name: MinecartCollisions
+main: com.bobcat00.minecartcollisions.MinecartCollisions
+version: 2.01
+author: Bobcat00
+description: Prevents minecarts from colliding with mobs or abandoned minecarts
+api-version: 1.13
+permissions:
+  minecartcollisions.debug:
+    description: Print debug messages to the players chat
+    default: false
+  minecartcollisions.exempt:
+    description: Disable the plugin for a particular player
+    default: false

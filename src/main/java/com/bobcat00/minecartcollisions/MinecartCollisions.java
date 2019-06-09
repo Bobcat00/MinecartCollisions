@@ -16,6 +16,7 @@
 
 package com.bobcat00.minecartcollisions;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class MinecartCollisions extends JavaPlugin
@@ -25,6 +26,11 @@ public final class MinecartCollisions extends JavaPlugin
     public void onEnable()
     {
         getServer().getPluginManager().registerEvents(new Listeners(this), this);
+        
+        // Metrics
+        @SuppressWarnings("unused")
+        Metrics metrics = new Metrics(this);
+        getLogger().info("Enabled metrics. You may opt-out by changing plugins/bStats/config.yml");
     }
  
     @Override

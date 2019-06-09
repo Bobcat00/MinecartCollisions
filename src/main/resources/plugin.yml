@@ -1,6 +1,6 @@
 name: MinecartCollisions
 main: com.bobcat00.minecartcollisions.MinecartCollisions
-version: 2.01
+version: ${project.version}
 author: Bobcat00
 description: Prevents minecarts from colliding with mobs or abandoned minecarts
 api-version: 1.13

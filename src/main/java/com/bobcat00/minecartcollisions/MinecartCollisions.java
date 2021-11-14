@@ -28,11 +28,10 @@ public final class MinecartCollisions extends JavaPlugin
         getServer().getPluginManager().registerEvents(new Listeners(this), this);
         
         // Metrics
-        Metrics metrics = new Metrics(this);
-        if (metrics.isEnabled())
-        {
-            getLogger().info("Enabled metrics. You may opt-out by changing plugins/bStats/config.yml");
-        }
+        int pluginId = 4861;
+        @SuppressWarnings("unused")
+        Metrics metrics = new Metrics(this, pluginId);
+        getLogger().info("Metrics enabled if allowed by plugins/bStats/config.yml");
     }
  
     @Override

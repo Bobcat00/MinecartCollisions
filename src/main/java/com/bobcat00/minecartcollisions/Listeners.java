@@ -22,14 +22,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Golem;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Slime;
-import org.bukkit.entity.Zombie;
 import org.bukkit.entity.minecart.RideableMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -49,12 +46,13 @@ public final class Listeners implements Listener
     @EventHandler(priority = EventPriority.HIGH)
     public void onVehicleMove(VehicleMoveEvent event)
     {
-        if (!(event.getVehicle() instanceof Minecart)) return;
+        if (!(event.getVehicle() instanceof RideableMinecart)) return;
         
-        Minecart minecart = (Minecart) event.getVehicle();
+        RideableMinecart minecart = (RideableMinecart) event.getVehicle();
         
         if (!minecart.isEmpty())
         {
+            // Check that a player is riding in the minecart
             Player player = null;
             for (Entity passenger : minecart.getPassengers())
             {
@@ -84,27 +82,35 @@ public final class Listeners implements Listener
                     if ((entity instanceof Monster) ||
                         (entity instanceof Animals) ||
                         (entity instanceof NPC)     ||
-                        (entity instanceof Slime))
+                        (entity instanceof Slime)   ||
+                        (entity instanceof Golem))
                     {
-                        // Handle spider jockeys, chicken jockeys, and skeleton traps
-                        if (((entity.getType() == EntityType.SPIDER) &&
-                             !entity.isEmpty() && (entity.getPassengers().get(0) instanceof Skeleton)) ||
-                            ((entity.getType() == EntityType.CHICKEN) &&
-                             !entity.isEmpty() && (entity.getPassengers().get(0) instanceof Zombie)) ||
-                            ((entity.getType() == EntityType.SKELETON_HORSE) &&
-                             !entity.isEmpty() && (entity.getPassengers().get(0) instanceof Skeleton)))
+                        // Eject passengers from this entity, unless any of the passengers are players
+                        if (!entity.isEmpty())
                         {
-                            entity.eject();
-                            if (player.hasPermission("minecartcollisions.debug"))
+                            boolean playerFound = false;
+                            for (Entity passenger : entity.getPassengers())
                             {
-                                player.sendMessage(ChatColor.LIGHT_PURPLE + "[MinecartCollisions] " + ChatColor.WHITE + 
-                                        "Ejected passengers from " + entity.getType());
+                                if (passenger instanceof Player)
+                                {
+                                    playerFound = true;
+                                    break;
+                                }
+                            }
+                            if (!playerFound)
+                            {
+                                entity.eject();
+                                if (player.hasPermission("minecartcollisions.debug"))
+                                {
+                                    player.sendMessage(ChatColor.LIGHT_PURPLE + "[MinecartCollisions] " + ChatColor.WHITE +
+                                            "Ejected passengers from " + entity.getType());
+                                }
                             }
                         }
                         
                         if (!entity.isInsideVehicle() && entity.isEmpty())
                         {
-                            // Entity is a monster, animal, NPC, or slime, is not riding in a vehicle and has no passengers.
+                            // Entity is a monster, animal, NPC, slime, or golem, is not riding in a vehicle and has no passengers.
                             // Move the entity further away from the minecart.
                             // This may kill the entity (sucks to be him!).
                             
@@ -157,7 +163,6 @@ public final class Listeners implements Listener
                                 DecimalFormat df = new DecimalFormat();
                                 df.setMinimumFractionDigits(2);
                                 df.setMaximumFractionDigits(2);
-    
                                 player.sendMessage(ChatColor.LIGHT_PURPLE + "[MinecartCollisions] " + ChatColor.WHITE + 
                                         "Teleported " + entity.getType() + " to " +
                                         df.format(newX) + ", " + df.format(newZ));
